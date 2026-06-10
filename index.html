@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -77,7 +76,6 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
 .main-title .name-line { display: block; margin-top: 4px; font-family: var(--font-name); font-size: clamp(38px, 6vw, 64px); font-weight: 900; color: var(--primary-dark); letter-spacing: 0; line-height: 1; white-space: nowrap; text-shadow: 0 5px 14px rgba(8, 112, 70, 0.18); }
 .subtitle { display: inline-flex; align-items: center; justify-content: center; margin: 16px auto 0 auto; padding: 9px 16px; max-width: 680px; color: var(--muted); background: rgba(255, 255, 255, 0.76); border: 1px solid rgba(22, 160, 100, 0.14); border-radius: 999px; font-family: var(--font-body); font-size: 16px; font-weight: 500; line-height: 1.9; }
 
-/* تنسيق حاوية الأزرار والنصوص العلوية */
 .top-actions-container {
     display: flex;
     flex-direction: column;
@@ -86,7 +84,6 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
     margin-top: 20px;
 }
 
-/* تنسيق زر التثبيت النصي في الأعلى */
 .install-text-btn {
     display: inline-flex;
     align-items: center;
@@ -108,7 +105,6 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
-/* عداد المشاهدات */
 .live-counter-container {
     display: inline-flex;
     align-items: center;
@@ -148,7 +144,6 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
 .card-link::before { content: "←"; font-size: 17px; transition: transform 0.2s ease; }
 .work-card:hover .card-link::before { transform: translateX(-4px); }
 
-/* شريط سفلي متناسق ومتجاوب */
 .footer-note { 
     position: fixed; 
     bottom: 0; 
@@ -172,7 +167,6 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
     text-align: center;
 }
 
-/* النافذة المنبثقة الترحيبية */
 .welcome-popup {
     position: fixed;
     inset: 0;
@@ -291,7 +285,7 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
             <p class="subtitle">جميع الأعمال التي تم القيام بها حتى الآن.</p>
             
             <div class="top-actions-container">
-                <button id="installAppBtn" class="install-text-btn">📲 تثبيت الموقع كتطبيق على جهازك</button>
+                <button id="installAppBtn" class="install-text-btn">📲 تحميل ملف التطبيق (APK) مباشرة هان</button>
                 
                 <div class="live-counter-container">
                     <div class="pulse-dot"></div>
@@ -365,7 +359,6 @@ body { margin: 0; padding: 0; font-family: var(--font-body); background: #f7fbf8
 </main>
 
 <script>
-// وظائف التحكم بالنافذة الترحيبية المنبثقة
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         document.getElementById('welcomePopup').classList.add('active');
@@ -376,74 +369,24 @@ function closePopup() {
     document.getElementById('welcomePopup').classList.remove('active');
 }
 
-// تشغيل وتفعيل الـ Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Service Worker Registered!'))
-        .catch(err => console.log('Service Worker Failed', err));
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
     });
 }
 
-// 🌟 السحر البرمجي هنا: تشغيل نافذة التثبيت تلقائياً فور جاهزية المتصفح
-let deferredPrompt;
+// الكود المعدل لتحميل الـ APK مباشرة إلى ملفات التحميل بالهاتف
 const installBtn = document.getElementById('installAppBtn');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-    // منع المتصفح من إظهار الشريط السفلي الافتراضي الصغير
-    e.preventDefault();
-    // حفظ الحدث
-    deferredPrompt = e;
+installBtn.addEventListener('click', () => {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = './app.apk'; 
+    downloadLink.download = 'Feras_Sehwail_App.apk';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
     
-    // 🚀 تشغيل نافذة التثبيت تلقائياً فوراً في وجه المستخدم بمجرد دخول الموقع
-    setTimeout(() => {
-        triggerAutomaticInstall();
-    }, 1500); // انتظر ثانية ونصف بعد تحميل الموقع لتنبثق النافذة تلقائياً
-});
-
-async function triggerAutomaticInstall() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt(); // إظهار نافذة التثبيت الرسمية للأندرويد تلقائياً
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('User installed the app');
-        }
-        deferredPrompt = null;
-    }
-}
-
-// تشغيل الـ الكليك العادي على الزر في حال رفض المستخدم أول مرة وأراد التثبيت لاحقاً
-installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-    } else {
-        alert("لتثبيت الموقع كتطبيق على جهازك:\n\n1. اضغط على زر خيارات المتصفح (المشاركة أو النقاط الثلاث العلوية).\n2. اختر 'إضافة إلى الشاشة الرئيسية' أو 'Install App'.");
-    }
-});
-
-window.addEventListener('appinstalled', () => {
-    installBtn.innerHTML = "✅ تم تثبيت الموقع كتطبيق بنجاح!";
-    installBtn.style.background = "linear-gradient(135deg, #16a064, #087046)";
-});
-
-installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-        }
-        deferredPrompt = null;
-    } else {
-        alert("لتثبيت الموقع كتطبيق على جهازك:\n\n1. اضغط على زر خيارات المتصفح (المشاركة أو النقاط الثلاث العلوية).\n2. اختر 'إضافة إلى الشاشة الرئيسية' أو 'Install App'.");
-    }
-});
-
-window.addEventListener('appinstalled', () => {
-    console.log('PWA was installed');
-    installBtn.innerHTML = "✅ تم تثبيت الموقع كتطبيق بنجاح!";
-    installBtn.style.background = "linear-gradient(135deg, #16a064, #087046)";
-    installBtn.style.cursor = "default";
+    alert("📥 بدأ الآن تحميل ملف التطبيق (APK) مباشرة إلى جهازك.\n\nبعد اكتمال التحميل، ستجده في مدير الملفات ويمكنك مشاركته وإرساله لأي شخص عبر شير إت (Shareit) بكل سهولة!");
 });
 </script>
 </body>
