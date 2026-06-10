@@ -1,0 +1,22 @@
+{
+  "name": "م. فراس محمد سحويل \"الركن\"",
+  "short_name": "فراس سحويل",
+  "description": "الموقع الشخصي للمهندس فراس محمد سحويل للخدمات الرقمية والأعمال",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f7fbf8",
+  "theme-color": "#16a064",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
