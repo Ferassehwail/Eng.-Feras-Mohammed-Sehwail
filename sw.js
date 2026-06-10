@@ -1,8 +1,9 @@
 const CACHE_NAME = 'feras-cache-v1';
+// تعديل المسارات لتصبح نسبية ومتوافقة مع استضافة GitHub
 const assets = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
 // تثبيت السيرفس وركر وتخزين الملفات الأساسية
