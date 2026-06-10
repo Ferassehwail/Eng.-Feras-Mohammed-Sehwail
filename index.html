@@ -376,33 +376,54 @@ function closePopup() {
     document.getElementById('welcomePopup').classList.remove('active');
 }
 
-// تشغيل وتفعيل الـ Service Worker للتطبيق والتحديث التلقائي
+// تشغيل وتفعيل الـ Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-        .then(reg => {
-            console.log('PWA Service Worker Registered!');
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        window.location.reload();
-                    }
-                };
-            };
-        })
+        .then(reg => console.log('PWA Service Worker Registered!'))
         .catch(err => console.log('Service Worker Failed', err));
     });
 }
 
-// إدارة وتفعيل زر التثبيت النصي في الأعلى
+// 🌟 السحر البرمجي هنا: تشغيل نافذة التثبيت تلقائياً فور جاهزية المتصفح
 let deferredPrompt;
 const installBtn = document.getElementById('installAppBtn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
+    // منع المتصفح من إظهار الشريط السفلي الافتراضي الصغير
     e.preventDefault();
+    // حفظ الحدث
     deferredPrompt = e;
-    installBtn.innerHTML = "📲 اضغط هنا لتثبيت الموقع كتطبيق فوراً";
+    
+    // 🚀 تشغيل نافذة التثبيت تلقائياً فوراً في وجه المستخدم بمجرد دخول الموقع
+    setTimeout(() => {
+        triggerAutomaticInstall();
+    }, 1500); // انتظر ثانية ونصف بعد تحميل الموقع لتنبثق النافذة تلقائياً
+});
+
+async function triggerAutomaticInstall() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt(); // إظهار نافذة التثبيت الرسمية للأندرويد تلقائياً
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User installed the app');
+        }
+        deferredPrompt = null;
+    }
+}
+
+// تشغيل الـ الكليك العادي على الزر في حال رفض المستخدم أول مرة وأراد التثبيت لاحقاً
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+    } else {
+        alert("لتثبيت الموقع كتطبيق على جهازك:\n\n1. اضغط على زر خيارات المتصفح (المشاركة أو النقاط الثلاث العلوية).\n2. اختر 'إضافة إلى الشاشة الرئيسية' أو 'Install App'.");
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    installBtn.innerHTML = "✅ تم تثبيت الموقع كتطبيق بنجاح!";
+    installBtn.style.background = "linear-gradient(135deg, #16a064, #087046)";
 });
 
 installBtn.addEventListener('click', async () => {
